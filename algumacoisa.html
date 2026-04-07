@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bonés</title>
+<link rel="stylesheet" href="https:
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+<div class="container-fluid">
+<a class="navbar-brand" href="#">Bonés</a>
+<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="
+<span class="navbar-toggler-icon"></span>
+</button>
+<div class="collapse navbar-collapse" id="navbarSupportedContent">
+<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+<li class="nav-item">
+<a class="nav-link active" aria-current="page" href="#">Início</a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="
+</li>
+<li class="nav-item">
+<a class="nav-link" href="#">Contato</a>
+</li>
+</ul>
+<form class="d-flex">
+<input class="form-control me-2" type="search" placeholder="Buscar" aria-label="Buscar" id="buscar">
+<button class="btn btn-outline-success" type="submit" onclick="buscarProdutos()">Buscar</button>
+</form>
+<button class="btn btn-primary" onclick="abrirCarrinho()">Carrinho (<span id="quantidadeCarrinho">0</span>)</button>
+</div>
+</div>
+</nav>
+</header>
+<main>
+<div class="container">
+<h1 class="text-center mt-5">Bonés</h1>
+<div class="row row-cols-1 row-cols-md-3 g-4" id="produtos">
+<!-- Produtos serão gerados aqui -->
+</div>
+</div>
+</main>
+<div class="modal fade" id="modalCarrinho" tabindex="-1" aria-labelledby="modalCarrinhoLabel" aria-hidden="true">
+<div class="modal-dialog">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title" id="modalCarrinhoLabel">Carrinho</h5>
+<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+<div class="modal-body" id="modalCarrinhoBody">
+<!-- Itens do carrinho serão gerados aqui -->
+</div>
+<div class="modal-footer">
+<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+<button type="button" class="btn btn-primary" onclick="finalizarCompra()">Finalizar Compra</button>
+</div>
+</div>
+</div>
+</div>
+<script src="https:
+<script src="script.js"></script>
+</body>
+</html>
+body {
+font-family: Arial, sans-serif;
+}
+
+.card {
+margin: 20px;
+}
+
+.card img {
+width: 100%;
+height: 200px;
+object-fit: cover;
+}
+let carrinho = [];
+let produtos = [];
+
+fetch('produtos.json')
+.then(response => response.json())
+.then(data => {
+produtos = data;
+gerarProdutos();
+});
+
+function gerarProdutos() {
+const produtosDiv = document.getElementById('produtos');
+produtosDiv.innerHTML = '';
+produtos.forEach(produto => {
+const produtoHTML = `
+<div class="col">
+<div class="card">
+<img src="${produto.imagem}" class="card-img-top" alt="${produto.nome}">
+<div class="card-body">
+<h5 class="card-title">${produto.nome}</h5>
+<p class="card-text">R$ ${produto.preco}</p>
+<button class="btn btn-primary" onclick="adicionarAoCarrinho(${produto.id})">Comprar</button>
+</div>
+</div>
+</div>
+`;
+produtosDiv.innerHTML += produtoHTML;
+});
+}
+
+function adicionarAoCarrinho(id) {
+const produto = produtos.find(p => p.id === id);
+carrinho.push(produto);
+atualizarQuantidadeCarrinho();
+}
+
+function atualizarQuantidadeCarrinho() {
+document.getElementById('quantidadeCarrinho').innerText = carrinho.length;
+}
+
+function abrirCarrinho() {
+const modalCarrinhoBody = document.getElementById('modalCarrinhoBody');
+modalCarrinhoBody.innerHTML = '';
+carrinho.forEach(produto => {
+const produtoHTML = `
+<div class="d-flex justify-content-between align-items-center">
+<img src="${produto.imagem}" alt="${produto.nome}" width="50" height="50">
+<span>${produto.nome}</span>
+<span>R$ ${produto.preco}</span>
+<button class="btn btn-danger" onclick="removerDoCarrinho(${produto.id})">Remover</button>
+</div>
+`;
+modalCarrinhoBody.innerHTML += produtoHTML;
+});
+const modalCarrinho = new bootstrap.Modal(document.getElementById('modalCarrinho'));
+modalCarrinho.show();
+}
+
+function removerDoCarrinho(id) {
+carrinho = carrinho.filter(p => p.id !== id);
+atualizarQuantidadeCarrinho();
+abrirCarrinho();
+}
+
+function finalizarCompra() {
+alert('Compra finalizada!');
+carrinho = [];
+atualizarQuantidadeCarrinho();
+}
+
+function buscarProdutos() {
+const buscar = document.getElementById('buscar').value.toLowerCase();
+const produtosFiltrados = produtos.filter(p => p.nome.toLowerCase().includes(buscar));
+const produtosDiv = document.getElementById('produtos');
+produtosDiv.innerHTML = '';
+produtosFiltrados.forEach(produto => {
+const produtoHTML = `
+<div class="col">
+<div class="card">
+<img src="${produto.imagem}" class="card-img-top" alt="${produto.nome}">
+<div class="card-body">
+<h5 class="card-title">${produto.nome}</h5>
+<p class="card-text">R$ ${produto.preco}</p>
+<button class="btn btn-primary" onclick="adicionarAoCarrinho(${produto.id})">Comprar</button>
+</div>
+</div>
+</div>
+`;
+produtosDiv.innerHTML += produtoHTML;
+});
+}
+[
+{
+"id": 1,
+"nome": "Boné 1",
+"preco": 50.00,
+"imagem": "imagens/bone1.jpg"
+},
+{
+"id": 2,
+"nome": "Boné 2",
+"preco": 60.00,
+"imagem": "imagens/bone2.jpg"
+},
+{
+"id": 3,
+"nome": "Boné 3",
+"preco": 70.00,
+"imagem": "imagens/bone3.jpg"
+}
+]
